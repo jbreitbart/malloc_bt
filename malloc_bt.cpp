@@ -22,7 +22,7 @@ extern "C" void free(void *ptr) {
 
 	size_t *size_ptr = (size_t *)(n - sizeof(size_t));
 // write zeros
-#pragma simd
+#pragma omp simd
 	for (size_t i = 0; i < *(size_ptr); ++i) {
 		n[i] = 0;
 	}
