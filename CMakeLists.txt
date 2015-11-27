@@ -13,15 +13,15 @@ if (OPENMP_FOUND)
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  ADD_DEFINITIONS(-g -Ofast -march=native)
+  ADD_DEFINITIONS(-g -Ofast -march=native -std=c++11)
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # Using GCC
-  ADD_DEFINITIONS(-g -O2 -march=native)
+  ADD_DEFINITIONS(-g -O2 -march=native -std=c++11)
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # Using Intel C++
-  ADD_DEFINITIONS(-g -fast)
+  ADD_DEFINITIONS(-g -fast -std=c++11)
 endif()
 ########
 
