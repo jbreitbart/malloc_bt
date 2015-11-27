@@ -35,11 +35,13 @@ extern "C" void free(void *ptr) {
 extern "C" void *realloc(void *ptr, size_t new_size) {
 	printf("realloc %p - %zu\n", ptr, new_size);
 	if (new_size == 0) return nullptr;
+	if (ptr == NULL) return malloc(new_size);
 
 	void *temp = malloc(new_size);
 
 	size_t old_size = *(size_t *)(static_cast<char *>(ptr) - sizeof(size_t));
-	std::memcpy(temp, ptr, old_size);
+	size_t copy_size = (old_size < new_size)? old_size : new_size;
+	std::memcpy(temp, ptr, copy_size);
 
 	free(ptr);
 	return temp;
