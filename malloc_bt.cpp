@@ -1,16 +1,19 @@
 #include "malloc.h"
 
+#ifdef ZERO
 #ifdef __STDC_LIB_EXT1__
 #error STDC_LIB_EXT1 is required!
 #endif
 #define __STDC_WANT_LIB_EXT1__ 1
+#include <cstring>
+#endif
 
 #ifdef RUNTIME
 #include <chrono>
 #endif
+
 #include <iostream>
 #include <cassert>
-#include <cstring>
 
 extern "C" void *__libc_malloc(size_t size);
 extern "C" void *__libc_free(void *ptr);
