@@ -1,6 +1,12 @@
 #include "malloc.h"
 
+#ifdef __STDC_LIB_EXT1__
+#error STDC_LIB_EXT1 is required!
+#endif
+#define __STDC_WANT_LIB_EXT1__ 1
+
 #include <cstdio>
+#include <cassert>
 #include <cstring>
 
 extern "C" void *__libc_malloc(size_t size);
@@ -18,17 +24,14 @@ extern "C" void *malloc(size_t size) {
 extern "C" void free(void *ptr) {
 	if (ptr == 0) return;
 
-	volatile char *ptr_ch = static_cast<volatile char *>(ptr);
+	char *ptr_ch = static_cast<char *>(ptr);
 
-	size_t *size_ptr = reinterpret_cast<size_t *>(const_cast<char *>(ptr_ch) - sizeof(size_t));
-// write zeros, do not use memset as it may be optimized away
-#pragma omp simd
-	for (size_t i = 0; i < *size_ptr; ++i) {
-		ptr_ch[i] = 0;
-	}
+	size_t *size_ptr = reinterpret_cast<size_t *>(ptr_ch - sizeof(size_t));
+
+	assert(0 = memset_s(ptr, *size_ptr, 0, *size_ptr));
 
 	*size_ptr = 0;
-	void *real_ptr = static_cast<void *>(const_cast<char *>(ptr_ch) - sizeof(size_t));
+	void *real_ptr = static_cast<void *>(ptr_ch - sizeof(size_t));
 	__libc_free(real_ptr);
 }
 
@@ -40,7 +43,7 @@ extern "C" void *realloc(void *ptr, size_t new_size) {
 	void *temp = malloc(new_size);
 
 	size_t old_size = *(size_t *)(static_cast<char *>(ptr) - sizeof(size_t));
-	size_t copy_size = (old_size < new_size)? old_size : new_size;
+	size_t copy_size = (old_size < new_size) ? old_size : new_size;
 	std::memcpy(temp, ptr, copy_size);
 
 	free(ptr);
