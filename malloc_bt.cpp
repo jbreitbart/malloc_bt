@@ -149,7 +149,14 @@ extern "C" void *calloc(size_t num, size_t size) {
 
 __attribute__((destructor)) static void destructor() {
 	std::cout << "===" << std::endl;
+#ifdef RUNTIME
+	double prec =
+		(double)std::chrono::high_resolution_clock::period::num / std::chrono::high_resolution_clock::period::den;
 	std::cout << "Durations measured in ns. Showing ms." << std::endl;
+	std::cout << "The precision of the time is " << prec << " second." << std::endl;
+	if (prec < 1E-9) std::cout << "   WARNING: TIME PRECISION BELOW MEASUREMENT PRECISION!" << std::endl;
+
+#endif
 
 	std::cout << "malloc:  \t" << malloc_counter
 #ifdef RUNTIME
