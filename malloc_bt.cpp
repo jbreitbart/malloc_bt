@@ -5,9 +5,9 @@
 #endif
 #define __STDC_WANT_LIB_EXT1__ 1
 
-//#ifdef RUNTIME
+#ifdef RUNTIME
 #include <chrono>
-//#endif
+#endif
 #include <iostream>
 #include <cassert>
 #include <cstring>

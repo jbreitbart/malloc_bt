@@ -27,10 +27,8 @@ endif()
 if (zero)
     ADD_DEFINITIONS(-DZERO)
 endif()
-
-
 ########
 
 add_library(malloc_bt SHARED malloc_bt.cpp)
 
-add_executable(test test.cpp)
+add_executable(simple_test simple_test.cpp)
