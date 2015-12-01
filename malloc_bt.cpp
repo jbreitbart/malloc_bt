@@ -48,6 +48,7 @@ extern "C" void *malloc(size_t size) {
 	char *temp = static_cast<char *>(__libc_malloc(new_size));
 #ifdef ZERO
 	*reinterpret_cast<size_t *>(temp) = size;
+	temp += sizeof(size_t);
 #endif
 
 #ifdef RUNTIME
@@ -55,7 +56,7 @@ extern "C" void *malloc(size_t size) {
 	malloc_time += std::chrono::duration_cast<nsT>(dur);
 #endif
 
-	return static_cast<void *>(temp + sizeof(size_t));
+	return static_cast<void *>(temp);
 }
 
 extern "C" void free(void *ptr) {
