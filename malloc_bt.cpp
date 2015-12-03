@@ -1,5 +1,7 @@
 #include "malloc.h"
 
+#include "libc_allocator.hpp"
+
 #ifdef ZERO
 #ifdef __STDC_LIB_EXT1__
 #error STDC_LIB_EXT1 is required!
@@ -14,6 +16,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <vector>
 
 extern "C" void *__libc_malloc(size_t size);
 extern "C" void *__libc_free(void *ptr);
@@ -153,7 +156,7 @@ __attribute__((destructor)) static void destructor() {
 	double prec =
 		(double)std::chrono::high_resolution_clock::period::num / std::chrono::high_resolution_clock::period::den;
 	std::cout << "Durations measured in ns. Showing ms." << std::endl;
-	std::cout << "The precision of the time is " << prec << " second." << std::endl;
+	std::cout << "The precision of the timer is " << prec << " second." << std::endl;
 	if (prec < 1E-9) std::cout << "   WARNING: TIME PRECISION BELOW MEASUREMENT PRECISION!" << std::endl;
 
 #endif
