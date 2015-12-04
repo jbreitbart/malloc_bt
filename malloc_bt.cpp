@@ -10,10 +10,6 @@
 #include <cstring>
 #endif
 
-#ifdef RUNTIME
-#include <chrono>
-#endif
-
 #include <iostream>
 #include <cassert>
 #include <vector>
@@ -23,15 +19,6 @@ extern "C" void *__libc_free(void *ptr);
 extern "C" void *__libc_realloc(void *ptr, size_t new_size);
 extern "C" void *__libc_calloc(size_t num, size_t size);
 
-#ifdef RUNTIME
-using msT = std::chrono::milliseconds;
-using nsT = std::chrono::nanoseconds;
-static nsT malloc_time = nsT(0);
-static nsT free_time = nsT(0);
-static nsT realloc_time = nsT(0);
-static nsT calloc_time = nsT(0);
-#endif
-
 static long malloc_counter = 0;
 static long free_counter = 0;
 static long realloc_counter = 0;
@@ -39,10 +26,6 @@ static long calloc_counter = 0;
 
 extern "C" void *malloc(size_t size) {
 	++malloc_counter;
-
-#ifdef RUNTIME
-	auto begin = std::chrono::high_resolution_clock::now();
-#endif
 
 	size_t new_size = size;
 #ifdef ZERO
@@ -54,11 +37,6 @@ extern "C" void *malloc(size_t size) {
 	temp += sizeof(size_t);
 #endif
 
-#ifdef RUNTIME
-	auto dur = std::chrono::high_resolution_clock::now() - begin;
-	malloc_time += std::chrono::duration_cast<nsT>(dur);
-#endif
-
 	return static_cast<void *>(temp);
 }
 
@@ -66,10 +44,6 @@ extern "C" void free(void *ptr) {
 	++free_counter;
 
 	if (ptr == 0) return;
-
-#ifdef RUNTIME
-	auto begin = std::chrono::high_resolution_clock::now();
-#endif
 
 #ifdef ZERO
 	char *ptr_ch = static_cast<char *>(ptr);
@@ -83,11 +57,6 @@ extern "C" void free(void *ptr) {
 	void *real_ptr = ptr;
 #endif
 	__libc_free(real_ptr);
-
-#ifdef RUNTIME
-	auto dur = std::chrono::high_resolution_clock::now() - begin;
-	free_time += std::chrono::duration_cast<nsT>(dur);
-#endif
 }
 
 extern "C" void *realloc(void *ptr, size_t new_size) {
@@ -95,18 +64,9 @@ extern "C" void *realloc(void *ptr, size_t new_size) {
 
 	if (new_size == 0) return nullptr;
 
-#ifdef RUNTIME
-	auto begin = std::chrono::high_resolution_clock::now();
-#endif
-
 #ifdef ZERO
 	if (ptr == NULL) {
 		void *temp = malloc(new_size);
-
-#ifdef RUNTIME
-		auto dur = std::chrono::high_resolution_clock::now() - begin;
-		realloc_time += std::chrono::duration_cast<nsT>(dur);
-#endif
 
 		return temp;
 	}
@@ -122,18 +82,10 @@ extern "C" void *realloc(void *ptr, size_t new_size) {
 	void *temp = __libc_realloc(ptr, new_size);
 #endif
 
-#ifdef RUNTIME
-	auto dur = std::chrono::high_resolution_clock::now() - begin;
-	realloc_time += std::chrono::duration_cast<nsT>(dur);
-#endif
-
 	return temp;
 }
 
 extern "C" void *calloc(size_t num, size_t size) {
-#ifdef RUNTIME
-	auto begin = std::chrono::high_resolution_clock::now();
-#endif
 
 #ifdef ZERO
 	++calloc_counter;
@@ -143,46 +95,18 @@ extern "C" void *calloc(size_t num, size_t size) {
 	void *ptr = __libc_calloc(num, size);
 #endif
 
-#ifdef RUNTIME
-	auto dur = std::chrono::high_resolution_clock::now() - begin;
-	calloc_time += std::chrono::duration_cast<nsT>(dur);
-#endif
 	return ptr;
 }
 
 __attribute__((destructor)) static void destructor() {
 	std::cout << "===" << std::endl;
-#ifdef RUNTIME
-	double prec =
-		(double)std::chrono::high_resolution_clock::period::num / std::chrono::high_resolution_clock::period::den;
-	std::cout << "Durations measured in ns. Showing ms." << std::endl;
-	std::cout << "The precision of the timer is " << prec << " second." << std::endl;
-	if (prec < 1E-9) std::cout << "   WARNING: TIME PRECISION BELOW MEASUREMENT PRECISION!" << std::endl;
 
-#endif
+	std::cout << "malloc:  \t" << malloc_counter << std::endl;
 
-	std::cout << "malloc:  \t" << malloc_counter
-#ifdef RUNTIME
-			  << "\t" << std::chrono::duration_cast<msT>(malloc_time).count() << " (ms)"
-#endif
-			  << std::endl;
+	std::cout << "free:    \t" << free_counter << std::endl;
 
-	std::cout << "free:    \t" << free_counter
-#ifdef RUNTIME
-			  << "\t" << std::chrono::duration_cast<msT>(free_time).count() << " (ms)"
-#endif
-			  << std::endl;
+	std::cout << "realloc: \t" << realloc_counter << std::endl;
 
-	std::cout << "realloc: \t" << realloc_counter
-#ifdef RUNTIME
-			  << "\t" << std::chrono::duration_cast<msT>(realloc_time).count() << " (ms)"
-#endif
-			  << std::endl;
-
-	std::cout << "calloc:  \t" << calloc_counter
-#ifdef RUNTIME
-			  << "\t" << std::chrono::duration_cast<msT>(calloc_time).count() << " (ms)"
-#endif
-			  << std::endl;
+	std::cout << "calloc:  \t" << calloc_counter << std::endl;
 	std::cout << "===" << std::endl;
 }

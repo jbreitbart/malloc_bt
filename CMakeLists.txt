@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_BUILD_TYPE Release)
 
-OPTION(runtime "Measure runtime" OFF)
 OPTION(zero "Zero memory on free" ON)
 
 ########
