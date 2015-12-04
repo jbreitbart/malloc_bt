@@ -1,4 +1,4 @@
-#include "malloc.h"
+#include "libc_malloc.hpp"
 
 #include "libc_allocator.hpp"
 
@@ -12,17 +12,13 @@
 
 #include <iostream>
 #include <cassert>
-#include <vector>
+#include <cstdint>
 
-extern "C" void *__libc_malloc(size_t size);
-extern "C" void *__libc_free(void *ptr);
-extern "C" void *__libc_realloc(void *ptr, size_t new_size);
-extern "C" void *__libc_calloc(size_t num, size_t size);
-
-static long malloc_counter = 0;
-static long free_counter = 0;
-static long realloc_counter = 0;
-static long calloc_counter = 0;
+// TODO no overflow check
+static uint64_t malloc_counter = 0;
+static uint64_t free_counter = 0;
+static uint64_t realloc_counter = 0;
+static uint64_t calloc_counter = 0;
 
 extern "C" void *malloc(size_t size) {
 	++malloc_counter;

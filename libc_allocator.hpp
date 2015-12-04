@@ -4,10 +4,7 @@
 #include <limits>
 #include <cstddef>
 
-extern "C" void *__libc_malloc(size_t size);
-extern "C" void *__libc_free(void *ptr);
-extern "C" void *__libc_realloc(void *ptr, size_t new_size);
-extern "C" void *__libc_calloc(size_t num, size_t size);
+#include "libc_malloc.hpp"
 
 /**
  * This is an allocator using __libc_* functions.
